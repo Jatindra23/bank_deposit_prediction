@@ -1,0 +1,18 @@
+pymongo==4.8.0
+numpy
+pandas
+seaborn
+statistics
+matplotlib
+scikit_learn
+catboost
+xgboost
+imblearn
+pydotplus
+graphviz
+python-dotenv
+dnspython==2.6.0
+PyYAML
+dill
+
+-e .

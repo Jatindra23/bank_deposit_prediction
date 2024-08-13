@@ -1,0 +1,40 @@
+columns:
+  - age: int
+  - job: object
+  - marital: object
+  - education: object
+  - default: object
+  - balance: int
+  - housing: object
+  - loan: object
+  - contact: object
+  - day: int
+  - month: object
+  - duration: int
+  - campaign: int
+  - pdays: int
+  - previous: int
+  - poutcome: object
+  - y: object
+
+numerical_columns:
+  - age
+  - balance
+  - day
+  - duration
+  - campaign
+  - pdays
+  - previous
+
+categorical_columns:
+  - job
+  - marital
+  - education
+  - default
+  - housing
+  - loan
+  - contact
+  - month
+  - poutcome
+  - y
+
