@@ -14,5 +14,6 @@ python-dotenv
 dnspython==2.6.0
 PyYAML
 dill
+plotly
 
 -e .
