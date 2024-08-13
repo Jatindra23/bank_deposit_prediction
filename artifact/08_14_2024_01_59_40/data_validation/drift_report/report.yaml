@@ -1,0 +1,45 @@
+age:
+  drift_status: false
+  p_value: 0.30538075123640374
+balance:
+  drift_status: false
+  p_value: 0.4235328454509736
+campaign:
+  drift_status: false
+  p_value: 0.9790543476507962
+contact:
+  drift_status: false
+  p_value: 0.7343781098139637
+day:
+  drift_status: false
+  p_value: 0.9555958468748879
+default:
+  drift_status: false
+  p_value: 0.9483034819610401
+duration:
+  drift_status: false
+  p_value: 0.2168481480121447
+education:
+  drift_status: false
+  p_value: 0.22740279868140267
+housing:
+  drift_status: false
+  p_value: 0.9840623584457769
+job:
+  drift_status: false
+  p_value: 0.5924819182975213
+loan:
+  drift_status: false
+  p_value: 0.48395478896088184
+marital:
+  drift_status: false
+  p_value: 0.6075028027903927
+month:
+  drift_status: true
+  p_value: 0.040744697210896505
+previous:
+  drift_status: false
+  p_value: 0.9479197107596041
+y:
+  drift_status: false
+  p_value: 0.19809735600864908

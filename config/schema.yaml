@@ -1,57 +1,102 @@
 columns:
   age: int
-  default: int
   balance: int
-  housing: int
-  loan: int
-  contact: int
   day: int
-  month: int
   duration: int
   campaign: int
   previous: int
-  y: int
-  job_blue-collar: int
-  job_entrepreneur: int
-  job_housemaid: int
-  job_management: int
-  job_retired: int
-  job_self-employed: int
-  job_services: int
-  job_student: int
-  job_technician: int
-  job_unemployed: int
-  marital_married: int
-  marital_single: int
-  edu_primary: int
-  edu_secondary: int
+  job: string
+  marital: string
+  education: string
+  default: string
+  housing: string
+  loan: string
+  contact: string
+  month: string
+  y: string
+  
 
 
 numerical_columns:
   age: int
-  default: int
   balance: int
-  housing: int
-  loan: int
-  contact: int
   day: int
-  month: int
   duration: int
   campaign: int
   previous: int
-  y: int
-  job_blue-collar: int
-  job_entrepreneur: int
-  job_housemaid: int
-  job_management: int
-  job_retired: int
-  job_self-employed: int
-  job_services: int
-  job_student: int
-  job_technician: int
-  job_unemployed: int
-  marital_married: int
-  marital_single: int
-  edu_primary: int
-  edu_secondary: int
 
+categorical_columns:
+  job: string
+  marital: string
+  education: string
+  default: string
+  housing: string
+  loan: string
+  contact: string
+  month: string
+  y: string
+
+  domain_value:
+    job:
+     - admin. 
+     - blue-collar 
+     - entrepreneur
+     - housemaid 
+     - management
+     - retired 
+     - self-employed
+     - services
+     - student 
+     - technician
+     - unemployed 
+     - unknown
+    
+    marital:
+    
+      - "divorced"
+      - "married"
+      - "single"
+      - "unknown"
+    education:
+    
+      - "primary"
+      - "secondary"
+      - "tertiary"
+      - "unknown"
+    
+    default:
+      - "no"
+      - "yes"
+      - "unknown"
+    
+    housing:
+      - "no"
+      - "yes"
+      - "unknown"
+    
+    loan:
+      - "no"
+      - "yes"
+      - "unknown"
+    
+    contact:
+      - "cellular"
+      - "telephone" 
+   
+    month:
+      - "jan"
+      - "feb"
+      - "mar"
+      - "apr"
+      - "may"
+      - "jun"
+      - "jul"
+      - "aug"
+      - "sep"
+      - "oct"
+      - "nov"
+      - "dec"
+    
+    y:
+      - "no"
+      - "yes"
