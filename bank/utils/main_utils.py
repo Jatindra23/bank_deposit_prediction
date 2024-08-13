@@ -42,7 +42,7 @@ def write_yaml_file(file_path: str, content: object, replace: bool = False) -> N
             if os.path.exists(file_path):
                 os.remove(file_path)
 
-        os.makedirs(os.path.diraname(file_path), exists_ok=True)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
 
         with open(file_path, "w") as file:
             yaml.dump(content, file)

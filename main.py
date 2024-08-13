@@ -19,4 +19,4 @@ if __name__ == "__main__":
     except Exception as e:
         raise BankException(e, sys)
 
-logging.info("Data Ingested Successfully")
+logging.info("Data Validation Successfully")

@@ -1,40 +1,57 @@
 columns:
-  - age: int
-  - job: object
-  - marital: object
-  - education: object
-  - default: object
-  - balance: int
-  - housing: object
-  - loan: object
-  - contact: object
-  - day: int
-  - month: object
-  - duration: int
-  - campaign: int
-  - pdays: int
-  - previous: int
-  - poutcome: object
-  - y: object
+  age: int
+  default: int
+  balance: int
+  housing: int
+  loan: int
+  contact: int
+  day: int
+  month: int
+  duration: int
+  campaign: int
+  previous: int
+  y: int
+  job_blue-collar: int
+  job_entrepreneur: int
+  job_housemaid: int
+  job_management: int
+  job_retired: int
+  job_self-employed: int
+  job_services: int
+  job_student: int
+  job_technician: int
+  job_unemployed: int
+  marital_married: int
+  marital_single: int
+  edu_primary: int
+  edu_secondary: int
+
 
 numerical_columns:
-  - age
-  - balance
-  - day
-  - duration
-  - campaign
-  - pdays
-  - previous
-
-categorical_columns:
-  - job
-  - marital
-  - education
-  - default
-  - housing
-  - loan
-  - contact
-  - month
-  - poutcome
-  - y
+  age: int
+  default: int
+  balance: int
+  housing: int
+  loan: int
+  contact: int
+  day: int
+  month: int
+  duration: int
+  campaign: int
+  previous: int
+  y: int
+  job_blue-collar: int
+  job_entrepreneur: int
+  job_housemaid: int
+  job_management: int
+  job_retired: int
+  job_self-employed: int
+  job_services: int
+  job_student: int
+  job_technician: int
+  job_unemployed: int
+  marital_married: int
+  marital_single: int
+  edu_primary: int
+  edu_secondary: int
 
