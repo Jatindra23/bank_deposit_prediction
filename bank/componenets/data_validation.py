@@ -39,3 +39,63 @@ class DataValidation:
 
         except Exception as e:
             raise BankException(e, sys)
+        
+
+    def is_numerical_column_exist(self,dataframe:pd.DataFrame)-> bool:
+        try:
+
+            numerical_columns = self._schema_config["numerical_columns"]
+            dataframe_columns = dataframe.columns
+
+            numerical_column_present = True
+            missing_numericla_columns = []
+
+            for num_column in numerical_columns:
+                if num_column not in dataframe_columns:
+                    numerical_column_poresent = False
+                    missing_numericla_columns.append(num_column)
+
+            logging.info(f"Missing numerical columns: {missing_numericla_columns}")
+
+            return numerical_column_present
+
+        except Exception as e:
+            raise BankException(e,sys)
+        
+    @staticmethod
+    def read_data(file_path)->pd.DataFrame:
+        """
+        Reads a CSV file from the given file path and returns the data as a pandas DataFrame.
+
+        Args:
+            file_path (str): The path to the CSV file.
+
+        Returns:
+            pd.DataFrame: The contents of the CSV file as a DataFrame.
+
+        Raises:
+            BankException: If an error occurs while reading the CSV file.
+        """
+        try:
+            
+            return pd.read_csv(file_path)
+
+        except Exception as e:
+            raise BankException (e,sys)
+        
+
+
+    def detect_dataset_drift(self, base_df, current_df, threshold: float = 0.05) -> bool:
+        try:
+            status = True
+            report = {}
+
+            for column in base_df.columns:
+                d1 = base_df[column]
+                d2 = current_df[column]
+
+                is_same_dit = ks_2samp(d1,d2)
+
+        except Exception as e:
+            raise BankException (e,sys)
+        

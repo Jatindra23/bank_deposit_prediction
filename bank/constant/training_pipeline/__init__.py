@@ -3,7 +3,7 @@ import os
 TARGET_COLUMN = "y"
 PIPELINE_NAME = "bank"
 ARTIFACT_DIR = "artifact"
-FILE_NAME = "bank.csv"
+FILE_NAME = "bank_clean.csv"
 
 
 TRAIN_FILE_NAME: str = "train.csv"
