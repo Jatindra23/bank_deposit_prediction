@@ -15,5 +15,6 @@ dnspython==2.6.0
 PyYAML
 dill
 plotly
+evidently==0.2.8
 
 -e .

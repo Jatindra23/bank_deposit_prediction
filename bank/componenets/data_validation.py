@@ -9,6 +9,16 @@ from scipy.stats import ks_2samp, chi2_contingency
 import pandas as pd
 import os
 import sys
+import numpy as np
+import json
+
+from evidently.model_profile import Profile
+from evidently.model_profile.sections import DataDriftProfileSection
+from evidently.report import Report
+from evidently.dashboard import Dashboard
+from evidently.tabs import DataDriftTab, CatTargetDriftTab
+
+
 
 
 class DataValidation:
@@ -23,6 +33,7 @@ class DataValidation:
             self.data_ingestion_artifact = data_ingestion_artifact
             self.data_validation_config = data_validation_config
             self._schema_config = read_yaml_file(SCHEMA_FILE_PATH)
+            np.random.seed(42)
 
         except Exception as e:
             raise BankException(e, sys)
@@ -103,67 +114,70 @@ class DataValidation:
         except Exception as e:
             raise BankException(e, sys)
 
+    def remove_duplicates(
+        self, test_data: pd.DataFrame, train_data: pd.DataFrame
+    ) -> pd.DataFrame:
+        try:
+            test_data.drop_duplicates(ignore_index=True, inplace=True)
+            train_data.drop_duplicates(ignore_index=True, inplace=True)
+
+            return test_data, train_data
+        except Exception as e:
+            raise BankException(e, sys)
+
+    def _check_data_drift(
+        self,
+    ):
+        try:
+            pass
+        except Exception as e:
+            raise BankException(e, sys)
+
+    def get_and_save_report(
+        self,
+    ):
+        try:
+            pass
+        except Exception as e:
+            raise BankException(e, sys)
+
+    def get_and_data_drift_report_page(
+        self,
+    ):
+        try:
+            pass
+        except Exception as e:
+            raise BankException(e, sys)
+
     def detect_dataset_drift(
-        self, base_df, current_df, threshold: float = 0.05
+        self, base_df, current_df
     ) -> bool:
         try:
-            status = True
-            report = {}
+            
+            data_drift_profile = Profile(sections=[DataDriftProfileSection()])
+        
+            data_drift_profile.calculate(base_df,current_df)
 
-            for column in base_df.columns:
-                d1 = base_df[column]
-                d2 = current_df[column]
+            report = data_drift_profile.json()
+            json_report = json.loads(report)
 
-                is_same_dist = ks_2samp(d1, d2)
-                if threshold <= is_same_dist.pvalue:
-                    is_found = False
+            write_yaml_file(file_path=self.data_validation_config.drift_report_file_path, content=json_report)
 
-                else:
-                    is_found = True
-                    status = False
+            data_drift_dashboard = Dashboard(tabs=[DataDriftTab()])
+            data_drift_dashboard.calculate(current_df, base_df)
+            data_drift_dashboard.save("data_drift_dashboard1.html")
 
-                report.update(
-                    {
-                        column: {
-                            "p_value": float(is_same_dist.pvalue),
-                            "drift_status": is_found,
-                        }
-                    }
-                )
+            n_features = json_report["data_drift"]["data"]["metrics"]["n_features"]
+            n_drifted_features = json_report["data_drift"]["data"]["metrics"]["n_drifted_features"]
 
-            for column in base_df.select_dtypes(include=["object"]).columns:
-                d1 = base_df[column]
-                d2 = current_df[column]
-
-                # Create contingency table
-                contingency_table = pd.crosstab(d1, d2)
-                chi2, p_value, dof, ex = chi2_contingency(
-                    contingency_table, correction=False
-                )
-
-                if p_value < threshold:
-                    is_found = False
-
-                else:
-                    is_found = True
-                    status = False
-
-                report.update(
-                    {column: {"p_value": float(p_value), "drift_status": not is_found}}
-                )
-
-            drift_report_file_path = self.data_validation_config.drift_report_file_path
-
-            # create directory
-            dir_path = os.path.dirname(drift_report_file_path)
-            os.makedirs(dir_path, exist_ok=True)
-
-            write_yaml_file(file_path=drift_report_file_path, content=report)
-
-            return status
+            logging.info(f"{n_drifted_features}/{n_features} drift detected.")
+            drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
+            return drift_status     
 
         except Exception as e:
             raise BankException(e, sys)
+        
+
 
     def initiate_data_validation(self) -> DataValidationConfig:
 
@@ -175,6 +189,12 @@ class DataValidation:
             # reading data from train and test file
             train_dataframe = DataValidation.read_data(train_file_path)
             test_dataframe = DataValidation.read_data(test_file_path)
+
+            # removing duplicates
+            train_dataframe, test_dataframe = self.remove_duplicates(
+                test_data=test_dataframe, train_data=train_dataframe
+            )
+            logging.info(f"the shape of train dataframe: {train_dataframe.shape} and test dataframe: {test_dataframe.shape}")
 
             # validate number of columns
             status = self.validate_number_of_columns(dataframe=train_dataframe)
