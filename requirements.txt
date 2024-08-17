@@ -16,5 +16,6 @@ PyYAML
 dill
 plotly
 evidently==0.2.8
+scipy
 
 -e .
