@@ -5,7 +5,6 @@ from bank.entity.config_entity import DataValidationConfig
 from bank.exception import BankException
 from bank.logger import logging
 from bank.utils.main_utils import read_yaml_file, write_yaml_file
-from scipy.stats import ks_2samp, chi2_contingency
 import pandas as pd
 import os
 import sys
@@ -17,8 +16,6 @@ from evidently.model_profile.sections import DataDriftProfileSection
 from evidently.report import Report
 from evidently.dashboard import Dashboard
 from evidently.tabs import DataDriftTab, CatTargetDriftTab
-
-
 
 
 class DataValidation:
@@ -52,15 +49,17 @@ class DataValidation:
             raise BankException(e, sys)
 
     def is_numerical_column_exist(self, dataframe: pd.DataFrame) -> bool:
+
         try:
 
             numerical_columns = self._schema_config["numerical_columns"]
-            dataframe_columns = dataframe.columns
+            numeric_columns = [list(cols.keys())[0] for cols in numerical_columns]
+            dataframe_columns = dataframe.select_dtypes(include="int64").columns
 
             numerical_column_present = True
             missing_numericla_columns = []
 
-            for num_column in numerical_columns:
+            for num_column in numeric_columns:
                 if num_column not in dataframe_columns:
                     numerical_column_present = False
                     missing_numericla_columns.append(num_column)
@@ -76,13 +75,15 @@ class DataValidation:
         try:
 
             categorical_columns = self._schema_config["categorical_columns"]
-            dataframe_columns = dataframe.columns
+            categorical_col = [cols for cols in categorical_columns]
+
+            dataframe_columns = dataframe.select_dtypes(include="object").columns
 
             categorical_column_present = True
             missing_categorical_columns = []
 
-            for cat_column in self._schema_config["categorical_columns"]:
-                if cat_column not in dataframe.columns:
+            for cat_column in categorical_col:
+                if cat_column not in dataframe_columns:
                     categorical_column_present = False
                     missing_categorical_columns.append(cat_column)
 
@@ -141,43 +142,44 @@ class DataValidation:
         except Exception as e:
             raise BankException(e, sys)
 
-    def get_and_data_drift_report_page(
-        self,
-    ):
+    def get_data_drift_report_page(self, current_df, base_df):
+
         try:
-            pass
+
+            data_drift_dashboard = Dashboard(tabs=[DataDriftTab()])
+            data_drift_dashboard.calculate(current_df, base_df)
+            data_drift_dashboard.save("data_drift_dashboard.html")
+
         except Exception as e:
             raise BankException(e, sys)
 
-    def detect_dataset_drift(
-        self, base_df, current_df
-    ) -> bool:
+    def detect_dataset_drift(self, base_df, current_df) -> bool:
         try:
-            
+
             data_drift_profile = Profile(sections=[DataDriftProfileSection()])
-        
-            data_drift_profile.calculate(base_df,current_df)
+
+            data_drift_profile.calculate(base_df, current_df)
 
             report = data_drift_profile.json()
             json_report = json.loads(report)
 
-            write_yaml_file(file_path=self.data_validation_config.drift_report_file_path, content=json_report)
-
-            data_drift_dashboard = Dashboard(tabs=[DataDriftTab()])
-            data_drift_dashboard.calculate(current_df, base_df)
-            data_drift_dashboard.save("data_drift_dashboard1.html")
+            write_yaml_file(
+                file_path=self.data_validation_config.drift_report_file_path,
+                content=json_report,
+            )
 
             n_features = json_report["data_drift"]["data"]["metrics"]["n_features"]
-            n_drifted_features = json_report["data_drift"]["data"]["metrics"]["n_drifted_features"]
+            n_drifted_features = json_report["data_drift"]["data"]["metrics"][
+                "n_drifted_features"
+            ]
 
             logging.info(f"{n_drifted_features}/{n_features} drift detected.")
             drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
-            return drift_status     
+
+            return drift_status
 
         except Exception as e:
             raise BankException(e, sys)
-        
-
 
     def initiate_data_validation(self) -> DataValidationConfig:
 
@@ -194,7 +196,9 @@ class DataValidation:
             train_dataframe, test_dataframe = self.remove_duplicates(
                 test_data=test_dataframe, train_data=train_dataframe
             )
-            logging.info(f"the shape of train dataframe: {train_dataframe.shape} and test dataframe: {test_dataframe.shape}")
+            logging.info(
+                f"the shape of train dataframe: {train_dataframe.shape} and test dataframe: {test_dataframe.shape}"
+            )
 
             # validate number of columns
             status = self.validate_number_of_columns(dataframe=train_dataframe)
@@ -207,12 +211,40 @@ class DataValidation:
                     f"{error_message} test dataframe doen't contain all the columns.\n"
                 )
 
+            num_col_status = self.is_train_numerical_column_exist = (
+                self.is_numerical_column_exist(dataframe=train_dataframe)
+            )
+            if not num_col_status:
+                error_message = f"{error_message} Train dataframe doesn't contain all the numerical columns.\n"
+
+            num_col_status = self.is_train_numerical_column_exist = (
+                self.is_numerical_column_exist(dataframe=test_dataframe)
+            )
+            if not num_col_status:
+                error_message = f"{error_message} test dataframe doen't contain all the numerical columns.\n"
+
+            # validate categorical columns
+            status = self.is_categorical_column_exist(dataframe=train_dataframe)
+            if not status:
+                error_message = f"{error_message} Train dataframe doesn't contain all the categorical columns.\n"
+
+            status = self.is_categorical_column_exist(dataframe=test_dataframe)
+            if not status:
+                error_message = f"{error_message} test dataframe doen't contain all the categorical columns.\n"
+
+            # validate dataset drift
+
             if len(error_message) > 0:
                 raise Exception(error_message)
 
-            status = self.detect_dataset_drift(
+            drift_status = self.detect_dataset_drift(
                 base_df=train_dataframe, current_df=test_dataframe
             )
+
+            if drift_status:
+                status = False
+            else:
+                status = True
 
             data_validation_artifact = DataValidationArtifact(
                 validation_status=status,

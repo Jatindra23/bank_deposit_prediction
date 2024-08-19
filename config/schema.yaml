@@ -1,40 +1,70 @@
 columns:
-  age: int
-  balance: int
-  day: int
-  duration: int
-  campaign: int
-  previous: int
-  job: string
-  marital: string
-  education: string
-  default: string
-  housing: string
-  loan: string
-  contact: string
-  month: string
-  y: string
+  - age: int
+  - balance: int
+  - day: int
+  - duration: int
+  - campaign: int
+  - previous: int
+  - job: category
+  - marital: category
+  - education: category
+  - default: category
+  - housing: category
+  - loan: category
+  - contact: category
+  - month: category
+  - y: category
   
 
 
+transform_columns:  # This will use power Transformation Technique
+  - age
+  - balance
+  - duration
+  - campaign
+  - previous
+ 
+ohe_columns:
+  - job
+  - marital
+  - education
+
+ord_columns:
+  - default
+  - housing
+  - loan
+  - contact
+  - month
+  
+impute_columns:
+  - job
+  - education
+  - contact
+
+
 numerical_columns:
-  age: int
-  balance: int
-  day: int
-  duration: int
-  campaign: int
-  previous: int
+  - age: int
+  - balance: int
+  - day: int
+  - duration: int
+  - campaign: int
+  - previous: int
 
 categorical_columns:
-  job: string
-  marital: string
-  education: string
-  default: string
-  housing: string
-  loan: string
-  contact: string
-  month: string
-  y: string
+  job: category
+  marital: category
+  education: category
+  default: category
+  housing: category
+  loan: category
+  contact: category
+  month: category
+  y: category
+
+
+target_column:
+  y: category
+
 
   domain_value:
     job:
@@ -100,3 +130,7 @@ categorical_columns:
     y:
       - "no"
       - "yes"
+
+
+
+  
