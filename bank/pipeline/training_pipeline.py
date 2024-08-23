@@ -4,6 +4,7 @@ from bank.entity.config_entity import (
     DataValidationConfig,
     DataTransformationConfig,
     ModelTrainerConfig,
+    ModelEvaluationConfig,
 )
 from bank.exception import BankException
 from bank.entity.artifact_entity import DataIngestionArtifact
@@ -11,6 +12,7 @@ from bank.entity.artifact_entity import (
     DataValidationArtifact,
     DataTransformationArtifact,
     ModelTrainerArtifact,
+    ModelEvaluationArtifact,
 )
 
 from bank.logger import logging
@@ -20,6 +22,7 @@ from bank.componenets.data_ingestion import DataIngestion
 from bank.componenets.data_validation import DataValidation
 from bank.componenets.data_transformation import DataTransformation
 from bank.componenets.model_trainer import ModelTrainer
+from bank.componenets.model_evaluation import ModelEvaluation
 
 
 class TrainPipeline:
@@ -116,6 +119,29 @@ class TrainPipeline:
         except Exception as e:
             raise BankException(e, sys)
 
+    def start_model_evaluation(
+        self,
+        data_validation_artifact: DataValidationArtifact,
+        model_trainer_artifact: ModelTrainerArtifact,
+    ) -> ModelEvaluationArtifact:
+
+        try:
+            model_evaluation_config = ModelEvaluationConfig(
+                training_pipeline_config=self.training_pipeline_config
+            )
+
+            model_evaluation = ModelEvaluation(
+                model_evaluation_config=model_evaluation_config,
+                data_validation_artifact=data_validation_artifact,
+                model_trainer_artifact=model_trainer_artifact,
+            )
+            model_evaluation_artifact = model_evaluation.initiate_model_evaluation()
+
+            return model_evaluation_artifact
+
+        except Exception as e:
+            raise BankException(e, sys)
+
     def run_pipeline(self):
         try:
 
@@ -133,6 +159,15 @@ class TrainPipeline:
             model_trainer_artifact = self.start_model_trainer(
                 data_transformation_artifact=data_transformation_artifact
             )
+
+            model_evaluation_artifact = self.start_model_evaluation(
+                data_validation_artifact,
+                model_trainer_artifact,
+            )
+            if not model_evaluation_artifact.is_model_accepted:
+                raise Exception("Trained model is not better than the best model")
+
+            return model_evaluation_artifact
 
         except Exception as e:
             raise BankException(e, sys)

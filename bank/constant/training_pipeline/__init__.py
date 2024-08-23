@@ -5,6 +5,8 @@ PIPELINE_NAME = "bank"
 ARTIFACT_DIR = "artifact"
 FILE_NAME = "bank_clean.csv"
 
+SAVED_MODEL_DIR = os.path.join("saved_models")
+
 
 TRAIN_FILE_NAME: str = "train.csv"
 TEST_FILE_NAME: str = "test.csv"
@@ -61,8 +63,6 @@ MODEL_TRAINER_OVER_FITTING_UNDER_FITTING_THRESHOLD: float = 0.05
 """
 Model Evaluation Related Constant Values
 """
-MODEL_EVALUATION_DIR_NAME: str = "model_ealuation"
+MODEL_EVALUATION_DIR_NAME: str = "model_evaluation"
 MODEL_EVALUATION_CHANGED_THRESHOLD_SCORE: float = 0.02
 MODEL_EVALUATION_REPORT_NAME: str = "model_eval_report.yaml"
-
-
