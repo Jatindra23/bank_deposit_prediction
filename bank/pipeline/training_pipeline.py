@@ -3,12 +3,14 @@ from bank.entity.config_entity import (
     DataIngestionConfig,
     DataValidationConfig,
     DataTransformationConfig,
+    ModelTrainerConfig,
 )
 from bank.exception import BankException
 from bank.entity.artifact_entity import DataIngestionArtifact
 from bank.entity.artifact_entity import (
     DataValidationArtifact,
     DataTransformationArtifact,
+    ModelTrainerArtifact,
 )
 
 from bank.logger import logging
@@ -17,6 +19,7 @@ import os
 from bank.componenets.data_ingestion import DataIngestion
 from bank.componenets.data_validation import DataValidation
 from bank.componenets.data_transformation import DataTransformation
+from bank.componenets.model_trainer import ModelTrainer
 
 
 class TrainPipeline:
@@ -92,6 +95,27 @@ class TrainPipeline:
         except Exception as e:
             raise BankException(e, sys)
 
+    def start_model_trainer(
+        self,
+        data_transformation_artifact: DataTransformationArtifact,
+    ) -> ModelTrainerArtifact:
+        try:
+            model_trainer_config = ModelTrainerConfig(
+                training_pipeline_config=self.training_pipeline_config
+            )
+
+            model_trainer = ModelTrainer(
+                model_trainer_config=model_trainer_config,
+                data_transformation_artifact=data_transformation_artifact,
+            )
+
+            model_trainer_artifact = model_trainer.initiate_model_trainer()
+
+            return model_trainer_artifact
+
+        except Exception as e:
+            raise BankException(e, sys)
+
     def run_pipeline(self):
         try:
 
@@ -104,6 +128,10 @@ class TrainPipeline:
             data_transformation_artifact = self.start_data_transformation(
                 data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact,
+            )
+
+            model_trainer_artifact = self.start_model_trainer(
+                data_transformation_artifact=data_transformation_artifact
             )
 
         except Exception as e:

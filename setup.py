@@ -29,7 +29,7 @@ def get_requirements() -> List[str]:
 
 setup(
     name="bank_term_deposit_prediction",
-    version="0.0.0.1",
+    version="1.0.0",
     author="Jatindra Paul",
     author_email="jatindrapaul7@gmail.com",
     packages=find_packages(),

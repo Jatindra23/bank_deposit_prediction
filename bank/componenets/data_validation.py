@@ -10,12 +10,15 @@ import os
 import sys
 import numpy as np
 import json
+import warnings
 
 from evidently.model_profile import Profile
 from evidently.model_profile.sections import DataDriftProfileSection
 from evidently.report import Report
 from evidently.dashboard import Dashboard
-from evidently.tabs import DataDriftTab, CatTargetDriftTab
+from evidently.dashboard.tabs import DataDriftTab, CatTargetDriftTab
+
+warnings.filterwarnings("ignore")
 
 
 class DataValidation:
@@ -126,21 +129,7 @@ class DataValidation:
         except Exception as e:
             raise BankException(e, sys)
 
-    def _check_data_drift(
-        self,
-    ):
-        try:
-            pass
-        except Exception as e:
-            raise BankException(e, sys)
-
-    def get_and_save_report(
-        self,
-    ):
-        try:
-            pass
-        except Exception as e:
-            raise BankException(e, sys)
+    
 
     def get_data_drift_report_page(self, current_df, base_df):
 
@@ -148,8 +137,17 @@ class DataValidation:
 
             data_drift_dashboard = Dashboard(tabs=[DataDriftTab()])
             data_drift_dashboard.calculate(current_df, base_df)
-            data_drift_dashboard.save("data_drift_dashboard.html")
+            os.makedirs(
+                os.path.dirname(
+                    self.data_validation_config.data_drift_report_page_file_path
+                ),
+                exist_ok=True,
+            )
+            html_report = data_drift_dashboard.save(
+                self.data_validation_config.data_drift_report_page_file_path
+            )
 
+            return html_report
         except Exception as e:
             raise BankException(e, sys)
 
@@ -175,7 +173,7 @@ class DataValidation:
 
             logging.info(f"{n_drifted_features}/{n_features} drift detected.")
             drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
-
+            logging.info(f"The drift Status is: {drift_status}")
             return drift_status
 
         except Exception as e:
@@ -240,6 +238,9 @@ class DataValidation:
             drift_status = self.detect_dataset_drift(
                 base_df=train_dataframe, current_df=test_dataframe
             )
+            drift_report_page = self.get_data_drift_report_page(
+                current_df=test_dataframe, base_df=train_dataframe
+            )
 
             if drift_status:
                 status = False
@@ -253,6 +254,7 @@ class DataValidation:
                 invalid_train_file_path=None,
                 invalid_test_file_path=None,
                 drift_report_file_path=self.data_validation_config.drift_report_file_path,
+                data_drift_report_page_file_path=drift_report_page,
             )
 
             logging.info(f"Data_validation_artifact: {data_validation_artifact}")
