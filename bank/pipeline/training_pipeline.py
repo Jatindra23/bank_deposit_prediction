@@ -146,28 +146,31 @@ class TrainPipeline:
         try:
 
             data_ingestion_artifact: DataIngestionArtifact = self.start_data_ingestion()
-
+            logging.info("Data Ingestion Successfull")
             data_validation_artifact = self.start_data_validation(
                 data_ingestion_artifact=data_ingestion_artifact
             )
+            logging.info("Data Validation Successfull")
 
             data_transformation_artifact = self.start_data_transformation(
                 data_ingestion_artifact=data_ingestion_artifact,
                 data_validation_artifact=data_validation_artifact,
             )
+            logging.info("Data Transformation Successfull")
 
             model_trainer_artifact = self.start_model_trainer(
                 data_transformation_artifact=data_transformation_artifact
             )
+            logging.info("Model Trainer Successfull")
 
             model_evaluation_artifact = self.start_model_evaluation(
                 data_validation_artifact,
                 model_trainer_artifact,
             )
+            logging.info("Model Evaluation Successfull")
+
             if not model_evaluation_artifact.is_model_accepted:
                 raise Exception("Trained model is not better than the best model")
-
-            return model_evaluation_artifact
 
         except Exception as e:
             raise BankException(e, sys)
