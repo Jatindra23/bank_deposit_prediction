@@ -9,6 +9,7 @@ from sklearn.preprocessing import (
     OneHotEncoder,
     OrdinalEncoder,
     PowerTransformer,
+    RobustScaler,
 )
 from sklearn.compose import ColumnTransformer
 
@@ -66,9 +67,10 @@ class DataTransformation:
         try:
             logging.info("Got numerical cols from schema config")
 
-            numeric_transformer = StandardScaler()
+            # numeric_transformer = StandardScaler()
             oh_transformer = OneHotEncoder()
             ordinal_encoder = OrdinalEncoder()
+            robust = RobustScaler()
 
             logging.info("Initialized StandardScaler, OneHotEncoder, OrdinalEncoder")
 
@@ -101,8 +103,8 @@ class DataTransformation:
                         transform_columns,
                     ),
                     (
-                        "StandardScaler",
-                        numeric_transformer,
+                        "RobustScaler",
+                        robust,
                         num_features,
                     ),
                 ]
@@ -185,7 +187,7 @@ class DataTransformation:
 
                 logging.info("Applying SMOTEENN on Training dataset")
 
-                smt = SMOTEENN(sampling_strategy="minority")
+                smt = SMOTEENN(random_state = 42,sampling_strategy="minority")
 
                 input_feature_train_final, target_feature_train_final = (
                     smt.fit_resample(input_feature_train_df, target_feature_train_df)

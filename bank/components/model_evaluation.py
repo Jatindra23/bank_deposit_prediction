@@ -18,6 +18,7 @@ from bank.ml.model.estimator import ModelResolver
 from bank.constant.training_pipeline import TARGET_COLUMN
 from bank.ml.model.estimator import TargetValueMapping
 import pandas as pd
+import numpy as np
 
 
 class ModelEvaluation:
@@ -64,7 +65,7 @@ class ModelEvaluation:
                 self.model_trainer_artifact.trained_model_object_file_path
             )
             model_resolver = ModelResolver()
-            logging.info("checking error 0")
+            
             is_model_accepted = True
 
             if not model_resolver.is_model_exists():
@@ -89,7 +90,7 @@ class ModelEvaluation:
             trained_metric = get_classification_score(
                 y_true=y_true, y_pred=y_trained_pred
             )
-            logging.info("checking error")
+            
             latest_metric = get_classification_score(
                 y_true=y_true, y_pred=y_latest_pred
             )
@@ -112,13 +113,15 @@ class ModelEvaluation:
 
             model_evaluate_report = model_evaluation_artifact.__dict__
 
+            model_eval_report = self.convert_to_basic_types(data=model_evaluate_report)
+
             # save the report
             model_eval_dir_path = os.path.dirname(
                 self.model_evaluation_config.report_file_path
             )
             os.makedirs(model_eval_dir_path, exist_ok=True)
             write_yaml_file(
-                self.model_evaluation_config.report_file_path, model_evaluate_report
+                self.model_evaluation_config.report_file_path, model_eval_report
             )
             logging.info(f"Model evaluation artifact: {model_evaluation_artifact}")
 
@@ -126,3 +129,42 @@ class ModelEvaluation:
 
         except Exception as e:
             raise BankException(e, sys)
+        
+
+    def convert_to_basic_types(self,data):
+        """        
+                Recursively converts complex data types to their basic equivalents.
+        
+                This function is designed to handle nested data structures, such as dictionaries and lists,
+                and convert them to a format that can be easily serialized or processed.
+        
+                Args:
+                    data: The data to be converted. Can be a dictionary, list, numpy scalar, numpy array, or custom object.
+                        - If data is a dictionary, its values will be recursively converted.
+                        - If data is a list, its elements will be recursively converted.
+                        - If data is a numpy scalar, it will be converted to a Python scalar.
+                        - If data is a numpy array, it will be converted to a Python list.
+                        - If data is a custom object with a __dict__ attribute, its attributes will be recursively converted.
+        
+                Returns:
+                    The converted data in its basic type.
+                        - Dictionaries will be converted to dictionaries with basic types as values.
+                        - Lists will be converted to lists with basic types as elements.
+                        - Numpy scalars will be converted to Python scalars.
+                        - Numpy arrays will be converted to Python lists.
+                        - Custom objects will be converted to dictionaries with basic types as values.
+        
+        """
+        
+        if isinstance(data, dict):
+            return {k: self.convert_to_basic_types(v) for k, v in data.items()}
+        elif isinstance(data, list):
+            return [self.convert_to_basic_types(item) for item in data]
+        elif isinstance(data, np.generic):  # Handles numpy scalars
+            return data.item()
+        elif isinstance(data, np.ndarray):  # Handles numpy arrays
+            return data.tolist()
+        elif hasattr(data, '__dict__'):  # Handles custom objects with __dict__
+            return self.convert_to_basic_types(data.__dict__)
+        else:
+            return data

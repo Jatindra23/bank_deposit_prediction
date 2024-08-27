@@ -6,6 +6,7 @@ from bank.entity.config_entity import ModelTrainerConfig
 import os, sys
 
 from xgboost import XGBClassifier
+from sklearn.ensemble import RandomForestClassifier
 from bank.ml.metric.classification_metric import get_classification_score
 from bank.ml.model.estimator import BankModel
 from bank.utils.main_utils import save_object, load_object
