@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-app = FastAPI()
+# app = FastAPI()
 
 indian_places = {
     "Historical_and_Cultural_Landmarks": [
@@ -35,6 +35,6 @@ indian_places = {
 }
 
 
-@app.get("/get_items/{name}")
-async def hello(name):
-    return indian_places.get(name)
+# @app.get("/get_items/{name}")
+# async def hello(name):
+#     return indian_places.get(name)

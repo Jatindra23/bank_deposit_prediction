@@ -6,7 +6,7 @@ from bank.entity.config_entity import ModelTrainerConfig
 import os, sys
 
 from xgboost import XGBClassifier
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.model_selection import RandomizedSearchCV
 from bank.ml.metric.classification_metric import get_classification_score
 from bank.ml.model.estimator import BankModel
 from bank.utils.main_utils import save_object, load_object
@@ -27,16 +27,49 @@ class ModelTrainer:
         except Exception as e:
             raise BankException(e, sys)
 
-    def perform_hyper_parameter_tuning(self):
+    def perform_hyper_parameter_tuning(self,x_train,y_train):
         try:
-            pass
+            # Define the parameter grid
+            param_grid = {
+                'learning_rate': [0.05, 0.1],
+                'n_estimators': [100, 200],
+                'max_depth': [3, 5],
+                'subsample': [0.8],
+                'colsample_bytree': [0.8]
+            }
+
+            # Initialize the XGBClassifier with some fixed parameters
+            xgb_clf = XGBClassifier(
+                    objective="binary:logistic",
+                    nthread=4,
+                    seed=27,
+                    )
+
+            # Perform grid search
+            random_search = RandomizedSearchCV(
+                    estimator=xgb_clf,
+                    param_distributions=param_grid,
+                    n_iter=10,  # Number of parameter settings that are sampled
+                    cv=3,  # 3-fold cross-validation
+                    n_jobs=-1,
+                    verbose=2,
+                    scoring='accuracy'
+                    )
+            random_search.fit(x_train, y_train)
+
+            # Return the best estimator found by GridSearchCV
+            logging.info(f"Best Parameters are {random_search.best_params_}")
+            return random_search.best_estimator_
+
 
         except Exception as e:
             raise BankException(e, sys)
 
     def train_model(self, x_train, y_train):
         try:
-            xgb_clf = XGBClassifier()
+
+            xgb_clf = self.perform_hyper_parameter_tuning(x_train, y_train)
+           
             xgb_clf.fit(x_train, y_train)
             return xgb_clf
         except Exception as e:
@@ -73,6 +106,7 @@ class ModelTrainer:
                 classification_train_metric.f1_score
                 <= self.model_trainer_config.expected_accuracy
             ):
+
                 raise BankException(
                     "Model is not good enough. Please try again with different parameters",
                     sys,

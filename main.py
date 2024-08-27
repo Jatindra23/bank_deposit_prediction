@@ -15,14 +15,76 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.responses import RedirectResponse
 from bank.constant.application import APP_HOST, APP_PORT
 from bank.exception import BankException
+from bank.entity.artifact_entity import DataValidationArtifact
+import uvicorn
+
+app = FastAPI()
+
+origins = ["*"]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-if __name__ == "__main__":
+@app.get("/", tags=["authentication"])
+async def index():
+    return RedirectResponse(url="/docs")
 
+
+@app.get("/train")
+async def train():
     try:
+        training_pipeline = TrainPipeline()
+        if training_pipeline.is_pipeline_running:
+            return Response("Training Pipelin is already running.")
 
+        training_pipeline.run_pipeline()
+        return Response("Training pipeline has been successfully initiated.")
+    except Exception as e:
+        return Response(f"Error Occured! {e}")
+
+
+@app.get("/predict")
+async def predict():
+    try:
+        # get data from the csv file
+        # convert it into data frame
+        data_path = DataValidationArtifact.valid_test_file_path
+        df = pd.read_csv(data_path)
+             
+        model_resolver = ModelResolver(model_dir=SAVED_MODEL_DIR)
+        if not model_resolver.is_model_exists():
+            return Response("Model is not available !")
+
+        best_model_path = model_resolver.get_best_model_path()
+        best_model = load_object(best_model_path)
+        y_pred = best_model.predict(df)
+        df["predicted_column"] = y_pred
+        df["predicted_column"].replace(
+            TargetValueMapping.reverse_mapping(), inplace=True
+        )
+
+        # get the output as you want
+        predictions = df.to_dict(orient="records")
+        return Response(f"this is the result {predictions}")
+    except Exception as e:
+        return Response(f"An error occurred: {str(e)}", status_code=500)
+
+
+def main():
+    try:
         training_pipeline = TrainPipeline()
         training_pipeline.run_pipeline()
 
     except Exception as e:
         raise BankException(e, sys)
+
+
+if __name__ == "__main__":
+
+    uvicorn.run(app, host="127.0.0.1", port=APP_PORT)
