@@ -1,6 +1,7 @@
 import os
 from bank.exception import BankException
 import sys
+import numpy as np
 
 from bank.constant.training_pipeline import SAVED_MODEL_DIR, MODEL_FILE_NAME
 
@@ -33,7 +34,8 @@ class BankModel:
         try:
 
             x_transform = self.preprocessor.transform(x)
-            y_hat = self.model.predict(x_transform)
+            testing_arr = np.c_[x_transform]
+            y_hat = self.model.predict(testing_arr)
             return y_hat
 
         except Exception as e:

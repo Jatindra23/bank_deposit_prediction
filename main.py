@@ -54,9 +54,17 @@ async def predict():
     try:
         # get data from the csv file
         # convert it into data frame
-        data_path = DataValidationArtifact.valid_test_file_path
-        df = pd.read_csv(data_path)
-             
+        # data_validation_artifact = DataValidationArtifact()
+        # testing_file = data_validation_artifact.valid_test_file_path
+        # df = pd.read_csv(testing_file)
+
+        t_df = pd.read_csv(
+            r"C:\Users\JOY\Desktop\bank_term_deposit_prediction\bank_clean.csv"
+        )
+        t_df.drop_duplicates(inplace=True)
+
+        df = t_df.iloc[800:825, :]
+
         model_resolver = ModelResolver(model_dir=SAVED_MODEL_DIR)
         if not model_resolver.is_model_exists():
             return Response("Model is not available !")
@@ -65,13 +73,21 @@ async def predict():
         best_model = load_object(best_model_path)
         y_pred = best_model.predict(df)
         df["predicted_column"] = y_pred
+        target_value_mapping = TargetValueMapping()
         df["predicted_column"].replace(
-            TargetValueMapping.reverse_mapping(), inplace=True
+            target_value_mapping.reverse_mapping(), inplace=True
         )
 
         # get the output as you want
-        predictions = df.to_dict(orient="records")
-        return Response(f"this is the result {predictions}")
+        # Simplify the data
+        simplified_data = [
+            {"y": row["y"], "predicted_column": row["predicted_column"]}
+            for _, row in df.iterrows()
+        ]
+        # for record in simplified_data:
+        #     print(f"Actual: {record['y']}, Predicted: {record['predicted_column']}")
+        # predictions = df.to_dict(orient="records")
+        return Response(f"this is the result {simplified_data}")
     except Exception as e:
         return Response(f"An error occurred: {str(e)}", status_code=500)
 
