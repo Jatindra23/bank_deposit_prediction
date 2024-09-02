@@ -1,0 +1,9 @@
+artifact
+saved_models
+venv
+docs
+bank_notebooks
+.git
+bank_clean.csv
+logs
+catboost_info
