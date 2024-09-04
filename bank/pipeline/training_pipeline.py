@@ -181,7 +181,7 @@ class TrainPipeline:
             )
         except Exception as e:
             raise BankException(e, sys)
-        
+
     def sync_saved_model_dir_to_s3(self):
         try:
             aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/{SAVED_MODEL_DIR}"

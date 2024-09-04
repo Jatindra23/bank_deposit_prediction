@@ -1,6 +1,8 @@
 # BANK TERM DEPOSIT PREDICTION
  -  **Problem Statement**: Predict wether term deposit will be taken by the customer or not  based on the given features.
+
  -  **Dataset**: The dataset contains information about customers who have been called for a bank's term deposit.
+
  -  **Features**:  The dataset contains the following features
         - **Age**: The age of the customer
         - **Job**: The job of the customer

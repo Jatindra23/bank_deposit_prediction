@@ -10,6 +10,7 @@ from sklearn.model_selection import RandomizedSearchCV
 from bank.ml.metric.classification_metric import get_classification_score
 from bank.ml.model.estimator import BankModel
 from bank.utils.main_utils import save_object, load_object
+from sklearn.ensemble import RandomForestClassifier
 
 
 class ModelTrainer:
@@ -27,40 +28,39 @@ class ModelTrainer:
         except Exception as e:
             raise BankException(e, sys)
 
-    def perform_hyper_parameter_tuning(self,x_train,y_train):
+    def perform_hyper_parameter_tuning(self, x_train, y_train):
         try:
             # Define the parameter grid
             param_grid = {
-                'learning_rate': [0.05, 0.1],
-                'n_estimators': [100, 200],
-                'max_depth': [3, 5],
-                'subsample': [0.8],
-                'colsample_bytree': [0.8]
+                "subsample": [0.6],
+                "n_estimators": [200],
+                "max_depth": [8],
+                "learning_rate": [0.3],
+                "lambda": [0.6],
+                "colsample_bytree": [1.0],
+                "alpha": [0.6],
             }
 
             # Initialize the XGBClassifier with some fixed parameters
             xgb_clf = XGBClassifier(
-                    objective="binary:logistic",
-                    nthread=4,
-                    seed=27,
-                    )
+                objective="binary:logistic", nthread=4, seed=27, random_state=42
+            )
 
             # Perform grid search
             random_search = RandomizedSearchCV(
-                    estimator=xgb_clf,
-                    param_distributions=param_grid,
-                    n_iter=10,  # Number of parameter settings that are sampled
-                    cv=3,  # 3-fold cross-validation
-                    n_jobs=-1,
-                    verbose=2,
-                    scoring='accuracy'
-                    )
+                estimator=xgb_clf,
+                param_distributions=param_grid,
+                n_iter=50,  # Number of parameter settings that are sampled
+                cv=3,  # 3-fold cross-validation
+                n_jobs=-1,
+                verbose=2,
+                scoring="accuracy",
+            )
             random_search.fit(x_train, y_train)
 
             # Return the best estimator found by GridSearchCV
             logging.info(f"Best Parameters are {random_search.best_params_}")
             return random_search.best_estimator_
-
 
         except Exception as e:
             raise BankException(e, sys)
@@ -69,7 +69,7 @@ class ModelTrainer:
         try:
 
             xgb_clf = self.perform_hyper_parameter_tuning(x_train, y_train)
-           
+
             xgb_clf.fit(x_train, y_train)
             return xgb_clf
         except Exception as e:
@@ -116,6 +116,9 @@ class ModelTrainer:
             classification_test_metric = get_classification_score(
                 y_true=y_test, y_pred=y_test_pred
             )
+            logging.info(
+                f"classification_train_metric : {classification_train_metric.f1_score}, classification_test_metric : {classification_test_metric.f1_score}"
+            )
 
             # Overfitting and Underfitting
             diff = abs(
@@ -125,7 +128,8 @@ class ModelTrainer:
 
             if diff > self.model_trainer_config.overfitting_underfitting_threshold:
                 raise BankException(
-                    "Model is either overfitting or underfitting. Please try again with other mdoel"
+                    "Model is either overfitting or underfitting. Please try again with other mdoel",
+                    sys.exc_info(),
                 )
 
             preprocessor = load_object(

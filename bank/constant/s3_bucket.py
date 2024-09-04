@@ -1,2 +1,2 @@
-TRAINING_BUCKET_NAME = "bank-pred-pipeline"
-PREDICTION_BUCKET_NAME = "bank-datasourece"
+TRAINING_BUCKET_NAME = "bank-train-data-bucket"
+PREDICTION_BUCKET_NAME = "bank-pred-data-bucket"
