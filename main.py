@@ -58,9 +58,9 @@ async def predict():
         # testing_file = data_validation_artifact.valid_test_file_path
         # df = pd.read_csv(testing_file)
 
-        t_df = pd.read_csv(
-            r"C:\Users\JOY\Desktop\bank_term_deposit_prediction\bank_clean.csv"
-        )
+        # data path : "C:\Users\JOY\Desktop\bank_term_deposit_prediction\bank_clean.csv"
+
+        t_df = pd.read_csv("bank_term_deposit_prediction/bank_clean.csv")
         t_df.drop_duplicates(inplace=True)
 
         df = t_df.iloc[800:825, :]
@@ -104,8 +104,3 @@ def main():
 if __name__ == "__main__":
 
     uvicorn.run(app, host="127.0.0.1", port=APP_PORT)
-    
-
-
-
-
