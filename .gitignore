@@ -169,5 +169,5 @@ artifact
 #.idea/
 
 deployment_steps.txt
-.github
+
 catboost_info
