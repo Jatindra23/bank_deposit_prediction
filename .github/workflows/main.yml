@@ -86,9 +86,9 @@ jobs:
         run: |
          docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
-      # - name: Stop and remove bank container if running
-      #   run: |
-      #    docker ps -q --filter "name=bank" | grep -q . && docker stop bank && docker rm -fv bank
+      - name: Stop and remove bank container if running
+        run: |
+         docker ps -q --filter "name=bank" | grep -q . && docker stop bank && docker rm -fv bank
        
       - name: Run Docker Image to serve users
         run: |
