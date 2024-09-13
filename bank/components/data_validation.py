@@ -38,6 +38,15 @@ class DataValidation:
         except Exception as e:
             raise BankException(e, sys)
 
+    def remove_column(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+        try:
+
+            drop_column = self._schema_config["drop_columns"]
+            dataframe = dataframe.drop(columns=drop_column, axis=1, inplace=True)
+            return dataframe
+        except Exception as e:
+            raise BankException(e, sys)
+
     def validate_number_of_columns(self, dataframe: pd.DataFrame) -> bool:
         try:
             number_of_columns = len(self._schema_config["columns"])
@@ -58,7 +67,7 @@ class DataValidation:
             numerical_columns = self._schema_config["numerical_columns"]
             numeric_columns = [list(cols.keys())[0] for cols in numerical_columns]
             dataframe_columns = dataframe.select_dtypes(include="int64").columns
-
+            logging.info(f"numeric_columns: {dataframe_columns}  ")
             numerical_column_present = True
             missing_numericla_columns = []
 
@@ -81,6 +90,8 @@ class DataValidation:
             categorical_col = [cols for cols in categorical_columns]
 
             dataframe_columns = dataframe.select_dtypes(include="object").columns
+
+            logging.info(f"categorical_columns: {dataframe_columns}  ")
 
             categorical_column_present = True
             missing_categorical_columns = []
@@ -129,8 +140,6 @@ class DataValidation:
         except Exception as e:
             raise BankException(e, sys)
 
-    
-
     def get_data_drift_report_page(self, current_df, base_df):
 
         try:
@@ -151,32 +160,54 @@ class DataValidation:
         except Exception as e:
             raise BankException(e, sys)
 
+    # def detect_dataset_drift(self, base_df, current_df) -> bool:
+    #     try:
+
+    #         data_drift_profile = Profile(sections=[DataDriftProfileSection()])
+
+    #         data_drift_profile.calculate(base_df, current_df)
+
+    #         report = data_drift_profile.json()
+    #         json_report = json.loads(report)
+
+    #         write_yaml_file(
+    #             file_path=self.data_validation_config.drift_report_file_path,
+    #             content=json_report,
+    #         )
+
+    #         n_features = json_report["data_drift"]["data"]["metrics"]["n_features"]
+    #         n_drifted_features = json_report["data_drift"]["data"]["metrics"][
+    #             "n_drifted_features"
+    #         ]
+
+    #         logging.info(f"{n_drifted_features}/{n_features} drift detected.")
+    #         drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
+    #         logging.info(f"The drift Status is: {drift_status}")
+    #         return drift_status
+
+    #     except Exception as e:
+    #         raise BankException(e, sys)
+
     def detect_dataset_drift(self, base_df, current_df) -> bool:
         try:
+             
+             data_drift_profile = Profile(sections=[DataDriftProfileSection()])
 
-            data_drift_profile = Profile(sections=[DataDriftProfileSection()])
+             data_drift_profile.calculate(base_df, current_df)
 
-            data_drift_profile.calculate(base_df, current_df)
+             report = data_drift_profile.json()
+             json_report = json.loads(report)
 
-            report = data_drift_profile.json()
-            json_report = json.loads(report)
+             write_yaml_file(file_path=self.data_validation_config.drift_report_file_path, content=json_report)
 
-            write_yaml_file(
-                file_path=self.data_validation_config.drift_report_file_path,
-                content=json_report,
-            )
+             n_features = json_report["data_drift"]["data"]["metrics"]["n_features"]
+             n_drifted_features = json_report["data_drift"]["data"]["metrics"]["n_drifted_features"]
 
-            n_features = json_report["data_drift"]["data"]["metrics"]["n_features"]
-            n_drifted_features = json_report["data_drift"]["data"]["metrics"][
-                "n_drifted_features"
-            ]
-
-            logging.info(f"{n_drifted_features}/{n_features} drift detected.")
-            drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
-            logging.info(f"The drift Status is: {drift_status}")
-            return drift_status
-
+             logging.info(f"{n_drifted_features}/{n_features} drift detected.")
+             drift_status = json_report["data_drift"]["data"]["metrics"]["dataset_drift"]
+             return drift_status
         except Exception as e:
+            logging.error(f"Error during drift detection: {e}")
             raise BankException(e, sys)
 
     def initiate_data_validation(self) -> DataValidationConfig:
@@ -191,7 +222,7 @@ class DataValidation:
             test_dataframe = DataValidation.read_data(test_file_path)
 
             # removing duplicates
-            train_dataframe, test_dataframe = self.remove_duplicates(
+            test_dataframe, train_dataframe = self.remove_duplicates(
                 test_data=test_dataframe, train_data=train_dataframe
             )
             logging.info(

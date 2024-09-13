@@ -29,9 +29,8 @@ class DataTransformationArtifact:
 class ClassificationMetricArtifact:
     """Artifact for storing classification metrics."""
 
+    accuracy_score: float
     f1_score: float
-    precision_score: float
-    recall_score: float
 
 
 @dataclass
@@ -43,12 +42,12 @@ class ModelTrainerArtifact:
 
 @dataclass
 class ModelEvaluationArtifact:
-   is_model_accepted: bool 
-   improved_accuracy: float
-   best_model_path: str
-   trained_model_path: str
-   trained_model_metric_artifact: ClassificationMetricArtifact
-   best_model_metric_artifact:  ClassificationMetricArtifact
+    is_model_accepted: bool
+    improved_accuracy: float
+    best_model_path: str
+    trained_model_path: str
+    trained_model_metric_artifact: ClassificationMetricArtifact
+    best_model_metric_artifact: ClassificationMetricArtifact
 
 
 @dataclass

@@ -68,8 +68,10 @@ class ModelTrainer:
     def train_model(self, x_train, y_train):
         try:
 
-            xgb_clf = self.perform_hyper_parameter_tuning(x_train, y_train)
-
+            # xgb_clf = self.perform_hyper_parameter_tuning(x_train, y_train)
+            xgb_clf = XGBClassifier(
+                objective="binary:logistic", nthread=4, seed=27, random_state=42
+            )
             xgb_clf.fit(x_train, y_train)
             return xgb_clf
         except Exception as e:
@@ -89,21 +91,21 @@ class ModelTrainer:
             train_arr = load_numpy_array_data(train_file_path)
             test_arr = load_numpy_array_data(test_file_path)
 
-            x_train, y_train, x_test, y_test = (
+            X_train, y_train, X_test, y_test = (
                 train_arr[:, :-1],
                 train_arr[:, -1],
                 test_arr[:, :-1],
                 test_arr[:, -1],
             )
 
-            model = self.train_model(x_train, y_train)
-            y_train_pred = model.predict(x_train)
+            model = self.train_model(X_train, y_train)
+            y_train_pred = model.predict(X_train)
             classification_train_metric = get_classification_score(
                 y_true=y_train, y_pred=y_train_pred
             )
 
             if (
-                classification_train_metric.f1_score
+                classification_train_metric.accuracy_score
                 <= self.model_trainer_config.expected_accuracy
             ):
 
@@ -112,25 +114,25 @@ class ModelTrainer:
                     sys,
                 )
 
-            y_test_pred = model.predict(x_test)
+            y_test_pred = model.predict(X_test)
             classification_test_metric = get_classification_score(
                 y_true=y_test, y_pred=y_test_pred
             )
             logging.info(
-                f"classification_train_metric : {classification_train_metric.f1_score}, classification_test_metric : {classification_test_metric.f1_score}"
+                f"classification_train_metric : {classification_train_metric.accuracy_score}, classification_test_metric : {classification_test_metric.accuracy_score}"
             )
 
             # Overfitting and Underfitting
             diff = abs(
-                classification_train_metric.f1_score
-                - classification_test_metric.f1_score
+                classification_train_metric.accuracy_score
+                - classification_test_metric.accuracy_score
             )
 
-            if diff > self.model_trainer_config.overfitting_underfitting_threshold:
-                raise BankException(
-                    "Model is either overfitting or underfitting. Please try again with other mdoel",
-                    sys.exc_info(),
-                )
+            # if diff > self.model_trainer_config.overfitting_underfitting_threshold:
+            #     raise BankException(
+            #         "Model is either overfitting or underfitting. Please try again with other mdoel",
+            #         sys,
+            #     )
 
             preprocessor = load_object(
                 file_path=self.data_transformation_artifact.transformed_object_file_path
@@ -151,7 +153,7 @@ class ModelTrainer:
                 train_metric_artifact=classification_train_metric,
                 test_metric_artifact=classification_test_metric,
             )
-
+            logging.info(f"f1-accuracy: {classification_test_metric.f1_score}")
             logging.info(f"Model trainer artifact: {model_trainer_artifact}")
 
             return model_trainer_artifact

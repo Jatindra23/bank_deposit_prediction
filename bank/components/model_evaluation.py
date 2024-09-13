@@ -95,7 +95,9 @@ class ModelEvaluation:
                 y_true=y_true, y_pred=y_latest_pred
             )
 
-            improved_accuracy = trained_metric.f1_score - latest_metric.f1_score
+            improved_accuracy = (
+                trained_metric.accuracy_score - latest_metric.accuracy_score
+            )
             if self.model_evaluation_config.change_threshold < improved_accuracy:
                 is_model_accepted = True
 

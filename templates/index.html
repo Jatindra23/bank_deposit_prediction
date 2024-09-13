@@ -1,0 +1,351 @@
+<!-- <!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Term Deposit Prediction</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <style>
+        .input {
+            margin-bottom: 10px;
+        }
+        .focus {
+            border-color: #007BFF; /* Example focus color */
+            box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <h1>Bank Term Deposit Prediction</h1>
+    <form id="prediction-form">
+        <label for="age">Age:</label>
+        <input type="number" id="age" name="age" required><br><br>
+        
+        <label for="balance">Balance:</label>
+        <input type="number" id="balance" name="balance" required><br><br>
+        
+        <label for="days">Date(date of the month when the last contact was made):</label>
+        <input type="number" id="day" name="day" required><br><br>
+        
+        <label for="duration">Duration:(Duration of phone call)</label>
+        <input type="number" id="duration" name="duration" required><br><br>
+        
+        <label for="campaign">Campaign:(No. of times contacted during this campaign)</label>
+        <input type="number" id="campaign" name="campaign" required><br><br>
+        
+        <label for="previous">Previous:(Number of times contacted previously)</label>
+        <input type="number" id="previous" name="previous" required><br><br>
+        
+        <label for="job">Job:</label>
+        <select id="job" name="job" required>
+            <option value="admin">Admin</option>
+            <option value="blue-collar">Blue-collar</option>
+            <option value="entrepreneur">Entrepreneur</option>
+            <option value="housemaid">Housemaid</option>
+            <option value="management">Management</option>
+            <option value="retired">Retired</option>
+            <option value="self-employed">Self-employed</option>
+            <option value="services">Services</option>
+            <option value="student">Student</option>
+            <option value="technician">Technician</option>
+            <option value="unemployed">Unemployed</option>
+            <option value="unknown">Unknown</option>
+        </select><br><br>
+        
+        <label for="marital">Marital Status:</label>
+        <select id="marital" name="marital" required>
+            <option value="divorced">Divorced</option>
+            <option value="married">Married</option>
+            <option value="single">Single</option>
+            <option value="unknown">Unknown</option>
+        </select><br><br>
+        
+        <label for="education">Education:</label>
+        <select id="education" name="education" required>
+            <option value="primary">Primary</option>
+            <option value="secondary">Secondary</option>
+            <option value="tertiary">Tertiary</option>
+            <option value="unknown">Unknown</option>
+        </select><br><br>
+        
+        <label for="default">Default:</label>
+        <select id="default" name="default" required>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+            <option value="unknown">Unknown</option>
+        </select><br><br>
+        
+        <label for="housing">Housing Loan:</label>
+        <select id="housing" name="housing" required>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+            <option value="unknown">Unknown</option>
+        </select><br><br>
+        
+        <label for="loan">Personal Loan:</label>
+        <select id="loan" name="loan" required>
+            <option value="no">No</option>
+            <option value="yes">Yes</option>
+            <option value="unknown">Unknown</option>
+        </select><br><br>
+        
+        <label for="contact">Contact Communication Type:</label>
+        <select id="contact" name="contact" required>
+            <option value="cellular">Cellular</option>
+            <option value="telephone">Telephone</option>
+        </select><br><br>
+        
+        <label for="month">Month:</label>
+        <select id="month" name="month" required>
+            <option value="jan">January</option>
+            <option value="feb">February</option>
+            <option value="mar">March</option>
+            <option value="apr">April</option>
+            <option value="may">May</option>
+            <option value="jun">June</option>
+            <option value="jul">July</option>
+            <option value="aug">August</option>
+            <option value="sep">September</option>
+            <option value="oct">October</option>
+            <option value="nov">November</option>
+            <option value="dec">December</option>
+        </select><br><br>
+        
+        <input type="submit" value="Predict">
+    </form>
+    
+    <h2>Prediction Result:</h2>
+    <p id="result"></p>
+    
+    <script>
+        // Function to handle prediction
+        document.getElementById('predict-form').addEventListener('submit', async function(e) {
+            e.preventDefault(); // Prevent page reload on form submit
+
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData);  // Convert form data to JSON
+
+            try {
+                const response = await fetch('/predict', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(data),  // Send form data as JSON
+                });
+
+                if (response.ok) {
+                    const result = await response.json();  // Parse JSON response
+                    document.getElementById('result').innerText = `Prediction: ${result.prediction}`;
+                } else {
+                    document.getElementById('result').innerText = 'An error occurred. Please try again.';
+                }
+            } catch (error) {
+                document.getElementById('result').innerText = 'An error occurred. Please try again.';
+            }
+        });
+
+        // Function to handle model training
+        document.getElementById('train-button').addEventListener('click', async function() {
+            try {
+                const response = await fetch('/train', {
+                    method: 'POST',
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    document.getElementById('train-result').innerText = result.message;
+                } else {
+                    document.getElementById('train-result').innerText = 'Training failed. Please try again.';
+                }
+            } catch (error) {
+                document.getElementById('train-result').innerText = 'An error occurred during training.';
+            }
+        });
+
+        // jQuery code for input focus
+        $(document).ready(function() {
+            $(".input").focus(function(){
+                $(this).parent().addClass("focus");
+            }).blur(function(){
+                if($(this).val() === ''){
+                    $(this).parent().removeClass("focus");
+                }
+            });
+        });
+    </script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bank Term Deposit Prediction</title>
+    <link rel="stylesheet" href="{{ url_for('static', path='/style/style.css') }}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
+  </head>
+  <body>
+    <nav class="navbar navbar-light bg-light static-top">
+      <div class="container-fluid">
+        <!-- Navbar or branding -->
+      </div>
+    </nav>
+
+    <section>
+      <div class="container">
+        <form id="prediction-form" method="post" action="/" >
+          <legend>Bank Term Deposit Prediction</legend>
+          
+          <div class="mb-3">
+            <label for="age">Age:</label>
+            <input type="number" class="form-control" id="age" name="age" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="balance">Balance:</label>
+            <input type="number" class="form-control" id="balance" name="balance" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="day">Date (Date of the month when last contact was made):</label>
+            <input type="number" class="form-control" id="day" name="day" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="duration">Duration (Phone call duration in seconds):</label>
+            <input type="number" class="form-control" id="duration" name="duration" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="campaign">Campaign (No. of contacts during this campaign):</label>
+            <input type="number" class="form-control" id="campaign" name="campaign" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="previous">Previous (No. of contacts before this campaign):</label>
+            <input type="number" class="form-control" id="previous" name="previous" required>
+          </div>
+          
+          <div class="mb-3">
+            <label for="job">Job:</label>
+            <select class="form-control" id="job" name="job" required>
+              <option value="" disabled selected>Select Job</option>
+              <option value="admin">Admin</option>
+              <option value="blue-collar">Blue-collar</option>
+              <option value="entrepreneur">Entrepreneur</option>
+              <option value="housemaid">Housemaid</option>
+              <option value="management">Management</option>
+              <option value="retired">Retired</option>
+              <option value="self-employed">Self-employed</option>
+              <option value="services">Services</option>
+              <option value="student">Student</option>
+              <option value="technician">Technician</option>
+              <option value="unemployed">Unemployed</option>
+              <option value="unknown">Unknown</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="marital">Marital Status:</label>
+            <select class="form-control" id="marital" name="marital" required>
+              <option value="" disabled selected>Select Marital Status</option>
+              <option value="divorced">divorced</option>
+              <option value="married">married</option>
+              <option value="single">single</option>
+              <option value="unknown">unknown</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="education">Education:</label>
+            <select class="form-control" id="education" name="education" required>
+                <option value="primary">primary</option>
+                <option value="secondary">secondary</option>
+                <option value="tertiary">tertiary</option>
+                <option value="unknown">unknown</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="default">Default (Has credit in default?):</label>
+            <select class="form-control" id="default" name="default" required>
+              <option value="" disabled selected>Select Default Status</option>
+              <option value="no">no</option>
+              <option value="yes">yes</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="housing">Housing Loan:</label>
+            <select class="form-control" id="housing" name="housing" required>
+              <option value="" disabled selected>Select Housing Loan</option>
+              <option value="no">no</option>
+              <option value="yes">yes</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="loan">Personal Loan:</label>
+            <select class="form-control" id="loan" name="loan" required>
+              <option value="" disabled selected>Select Personal Loan</option>
+              <option value="no">no</option>
+              <option value="yes">yes</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="contact">Contact Communication Type:</label>
+            <select class="form-control" id="contact" name="contact" required>
+              <option value="" disabled selected>Select Contact Type</option>
+              <option value="cellular">cellular</option>
+              <option value="telephone">telephone</option>
+            </select>
+          </div>
+          
+          <div class="mb-3">
+            <label for="month">Month of Contact:</label>
+            <select class="form-control" id="month" name="month" required>
+              <option value="" disabled selected>Select Month</option>
+              <option value="jan">january</option>
+              <option value="feb">february</option>
+              <option value="mar">march</option>
+              <option value="apr">april</option>
+              <option value="may">may</option>
+              <option value="jun">june</option>
+              <option value="jul">july</option>
+              <option value="aug">august</option>
+              <option value="sep">september</option>
+              <option value="oct">october</option>
+              <option value="nov">november</option>
+              <option value="dec">december</option>
+            </select>
+          </div>
+          
+          <button type="submit" class="btn btn-primary">Predict</button>
+        </form>
+        <div class="text-center text-black"></div>
+          <h2>Prediction Result: {{context}}</h2>
+        </div>
+        <p id="result"></p>
+      </div>
+    </section>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.js"></script>
+    <script type="text/javascript">
+        $(".input").focus(function(){
+            $(this).parent().addClass("focus");
+        }).blur(function(){
+            if($(this).val() === ''){
+                $(this).parent().removeClass("focus");
+            }
+        })
+    </script>
+  </body>
+</html>
+
+
+
+

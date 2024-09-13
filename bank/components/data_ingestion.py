@@ -48,7 +48,7 @@ class DataIngestion:
 
     def split_data_as_train_test(self, dataframe: DataFrame) -> None:
         try:
-            test_set, train_set = train_test_split(
+            train_set, test_set = train_test_split(
                 dataframe,
                 test_size=self.data_ingestion_config.train_test_split_ratio,
                 random_state=42,

@@ -11,7 +11,9 @@ from sklearn.preprocessing import (
     PowerTransformer,
     RobustScaler,
 )
+from sklearn.impute import SimpleImputer
 from sklearn.compose import ColumnTransformer
+from imblearn.over_sampling import BorderlineSMOTE
 
 from bank.constant.training_pipeline import TARGET_COLUMN, SCHEMA_FILE_PATH
 from bank.entity.config_entity import DataTransformationConfig
@@ -67,9 +69,11 @@ class DataTransformation:
         try:
             logging.info("Got numerical cols from schema config")
 
-            # numeric_transformer = StandardScaler()
-            oh_transformer = OneHotEncoder()
-            ordinal_encoder = OrdinalEncoder()
+            numeric_transformer = StandardScaler()
+            oh_transformer = OneHotEncoder(handle_unknown="ignore")
+            ordinal_encoder = OrdinalEncoder(
+                handle_unknown="use_encoded_value", unknown_value=-1
+            )
             robust = RobustScaler()
 
             logging.info("Initialized StandardScaler, OneHotEncoder, OrdinalEncoder")
@@ -79,6 +83,7 @@ class DataTransformation:
             transform_columns = self._schema_config["transform_columns"]
             num_feature = self._schema_config["numerical_columns"]
             num_features = [list(cols.keys())[0] for cols in num_feature]
+            cat_columns = self._schema_config["categorical_columns"]
 
             logging.info("Initialize PowerTransformer")
 
@@ -87,6 +92,16 @@ class DataTransformation:
             )
             preprocessor = ColumnTransformer(
                 [
+                    (
+                        "Transformer",
+                        transform_pipe,
+                        transform_columns,
+                    ),
+                    (
+                        "StandardScaler",
+                        numeric_transformer,
+                        num_features,
+                    ),
                     (
                         "OneHotEncoder",
                         oh_transformer,
@@ -97,20 +112,11 @@ class DataTransformation:
                         ordinal_encoder,
                         or_columns,
                     ),
-                    (
-                        "Transformer",
-                        transform_pipe,
-                        transform_columns,
-                    ),
-                    (
-                        "RobustScaler",
-                        robust,
-                        num_features,
-                    ),
                 ]
             )
+
             logging.info(
-                f"oh_columns: {oh_columns}, or_columns: {or_columns}, transform_columns: {transform_columns}, num_features: {num_features}"
+                f"oh_columns: {oh_columns}, or_columns: {or_columns}, transform_columns: {num_features}, num_features: {num_features}"
             )
 
             logging.info("Created preprocessor object from ColumnTransformer")
@@ -148,7 +154,6 @@ class DataTransformation:
                 )
 
                 input_feature_train_df = train_df.drop(columns=[TARGET_COLUMN], axis=1)
-
                 target_feature_train_df = train_df[TARGET_COLUMN]
 
                 logging.info("Got train features and test features of Training dataset")
@@ -158,7 +163,6 @@ class DataTransformation:
                 )
 
                 input_feature_test_df = test_df.drop(columns=[TARGET_COLUMN], axis=1)
-
                 target_feature_test_df = test_df[TARGET_COLUMN]
 
                 target_feature_test_df = target_feature_test_df.replace(
@@ -187,21 +191,20 @@ class DataTransformation:
 
                 logging.info("Applying SMOTEENN on Training dataset")
 
-                smt = SMOTEENN(random_state = 42,sampling_strategy="minority")
+                smt = BorderlineSMOTE(random_state=42)
 
                 input_feature_train_final, target_feature_train_final = (
                     smt.fit_resample(input_feature_train_df, target_feature_train_df)
                 )
+                # input_feature_test_final, target_feature_test_final = smt.fit_resample(
+                #     input_feature_test_df, target_feature_test_df
+                # )
 
                 logging.info("Applied SMOTEENN on training dataset")
 
-                logging.info("Applying SMOTEENN on testing dataset")
-
-                input_feature_test_final, target_feature_test_final = smt.fit_resample(
-                    input_feature_test_df, target_feature_test_df
-                )
-
-                logging.info("Applied SMOTEENN on testing dataset")
+                # **Do not apply SMOTEENN to the test data**
+                input_feature_test_final = input_feature_test_df
+                target_feature_test_final = target_feature_test_df
 
                 logging.info("Created train array and test array")
 

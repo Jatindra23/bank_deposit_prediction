@@ -16,7 +16,6 @@ columns:
   - y: category
   
 
-
 transform_columns:  # This will use power Transformation Technique
   - age
   - balance
