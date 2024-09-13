@@ -226,7 +226,7 @@ async def predictRouteClient(request: Request):
         logging.info("Form submitted")
         form = DataForm(request)
         await form.get_bank_data()
-        #logging.info(f"Form data: age={form.age}, balance={form.balance}, day={form.day}")
+        # logging.info(f"Form data: age={form.age}, balance={form.balance}, day={form.day}")
 
         bank_data = BankInputData(
             age=form.age,
@@ -270,7 +270,4 @@ async def predictRouteClient(request: Request):
 
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="127.0.0.1", port=8080)  # Update port if needed
-
-
-
+    uvicorn.run(app, host=APP_HOST, port=8080)  # Update port if needed
