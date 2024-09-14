@@ -86,16 +86,16 @@ jobs:
         run: |
          docker pull ${{secrets.AWS_ECR_LOGIN_URI}}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
 
-      - name: Stop and remove bank container if running
-        run: |
-          container_id=$(docker ps -q --filter "name=bank")
-          if [ -n "$container_id" ]; then
-            echo "Stopping and removing container with ID: $container_id"
-            docker stop $container_id
-            docker rm -fv $container_id
-          else
-            echo "No running container found with name 'bank'"
-          fi
+      # - name: Stop and remove bank container if running
+      #   run: |
+      #     container_id=$(docker ps -q --filter "name=bank")
+      #     if [ -n "$container_id" ]; then
+      #       echo "Stopping and removing container with ID: $container_id"
+      #       docker stop $container_id
+      #       docker rm -fv $container_id
+      #     else
+      #       echo "No running container found with name 'bank'"
+      #     fi
        
        
       - name: Run Docker Image to serve users
