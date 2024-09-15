@@ -20,6 +20,7 @@ from starlette.responses import RedirectResponse
 from bank.constant.application import APP_HOST, APP_PORT
 from bank.entity.artifact_entity import DataValidationArtifact
 import uvicorn
+import gunicorn
 from fastapi import HTTPException
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
@@ -29,6 +30,7 @@ from fastapi.responses import HTMLResponse
 from fastapi import Request
 from typing import Optional
 from bank.utils2 import BankInputData, BankClassifier
+import subprocess
 
 # ...
 
@@ -271,3 +273,5 @@ async def predictRouteClient(request: Request):
 
 if __name__ == "__main__":
     uvicorn.run(app, host=APP_HOST, port=APP_PORT)  # Update port if needed
+
+# "127.0.0.1"

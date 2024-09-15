@@ -33,7 +33,7 @@ from bank.constant.training_pipeline import SAVED_MODEL_DIR
 
 class TrainPipeline:
     is_pipeline_running = False
-    s3_sync = S3sync()
+    # s3_sync = S3sync()
 
     def __init__(self):
         self.training_pipeline_config = TrainingPipelineConfig()
@@ -172,22 +172,24 @@ class TrainPipeline:
         except Exception as e:
             raise BankException(e, sys)
 
-    def sync_artifact_dir_to_s3(self):
-        try:
-            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/artifact/{self.training_pipeline_config.timestamp}"
-            self.s3_sync.sync_folder_to_s3(
-                folder=self.training_pipeline_config.artifact_dir,
-                aws_bucket_url=aws_bucket_url,
-            )
-        except Exception as e:
-            raise BankException(e, sys)
+    # def sync_artifact_dir_to_s3(self):
+    #     try:
+    #         aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/artifact/{self.training_pipeline_config.timestamp}"
+    #         self.s3_sync.sync_folder_to_s3(
+    #             folder=self.training_pipeline_config.artifact_dir,
+    #             aws_bucket_url=aws_bucket_url,
+    #         )
+    #     except Exception as e:
+    #         raise BankException(e, sys)
 
-    def sync_saved_model_dir_to_s3(self):  #save model in s3
-        try:
-            aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/{SAVED_MODEL_DIR}"
-            self.s3_sync.sync_folder_to_s3(folder = SAVED_MODEL_DIR),aws_bucket_url=aws_bucket_url
-        except Exception as e:
-            raise BankException(e, sys)
+    # def sync_saved_model_dir_to_s3(self):  # save model in s3
+    #     try:
+    #         aws_bucket_url = f"s3://{TRAINING_BUCKET_NAME}/{SAVED_MODEL_DIR}"
+    #         self.s3_sync.sync_folder_to_s3(
+    #             folder=SAVED_MODEL_DIR, aws_bucket_url=aws_bucket_url
+    #         )
+    #     except Exception as e:
+    #         raise BankException(e, sys)
 
     def run_pipeline(self):
         try:
@@ -225,13 +227,13 @@ class TrainPipeline:
 
             logging.info("Model Pusher Successfull")
 
-            self.sync_artifact_dir_to_s3()
+            # self.sync_artifact_dir_to_s3()
 
-            self.sync_saved_model_dir_to_s3()
+            # self.sync_saved_model_dir_to_s3()
 
             TrainPipeline.is_pipeline_running = False
 
         except Exception as e:
-            self.sync_artifact_dir_to_s3
+            # self.sync_artifact_dir_to_s3
             TrainPipeline.is_pipeline_running = False  # if some exception occurs the above line before exception will not execute thats why this line in between Exception will execute
             raise BankException(e, sys)
