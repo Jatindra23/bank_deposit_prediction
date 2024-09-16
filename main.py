@@ -21,6 +21,8 @@ from bank.constant.application import APP_HOST, APP_PORT
 from bank.entity.artifact_entity import DataValidationArtifact
 import uvicorn
 import gunicorn
+from flask import Flask, request, render_template, jsonify
+from flask_cors import CORS
 from fastapi import HTTPException
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
@@ -274,4 +276,4 @@ async def predictRouteClient(request: Request):
 if __name__ == "__main__":
     uvicorn.run(app, host=APP_HOST, port=APP_PORT)  # Update port if needed
 
-# "127.0.0.1"
+ # "127.0.0.1"
