@@ -29,4 +29,5 @@ wincertstore==0.2
 neuro-mf==0.0.5
 docker
 Jinja2
+python-multipart
 -e .

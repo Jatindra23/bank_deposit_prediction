@@ -20,7 +20,7 @@ from starlette.responses import RedirectResponse
 from bank.constant.application import APP_HOST, APP_PORT
 from bank.entity.artifact_entity import DataValidationArtifact
 import uvicorn
-from fastapi import HTTPException
+from fastapi import HTTPException,Form
 from pydantic import BaseModel
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
