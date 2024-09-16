@@ -162,7 +162,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 class DataForm:
     def __init__(self, request: Request):
         self.request: Request = request
@@ -227,6 +226,7 @@ async def predictRouteClient(request: Request):
         logging.info("Form submitted")
         form = DataForm(request)
         await form.get_bank_data()
+        
         # logging.info(f"Form data: age={form.age}, balance={form.balance}, day={form.day}")
 
         bank_data = BankInputData(
