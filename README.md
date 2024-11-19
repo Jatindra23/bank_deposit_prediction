@@ -50,6 +50,7 @@ Imbalanced Data: Use SMOTE or similar techniques to balance the dataset.
 Tools: pandas, numpy, imblearn.
 
 3. Exploratory Data Analysis: Understand patterns and correlations in data.
+  ![alt text](file:///D:/readme%20images/output1.png)
 
 
 4. Model Training: Train models using algorithms like XGBoost and CatBoost with hyperparameter tuning.
