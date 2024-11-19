@@ -50,7 +50,7 @@ Imbalanced Data: Use SMOTE or similar techniques to balance the dataset.
 Tools: pandas, numpy, imblearn.
 
 3. Exploratory Data Analysis: Understand patterns and correlations in data.
-  ![alt text](file:///D:/readme%20images/output1.png)
+   ![ From the above box plot, we observe outliers in the data. Further analysis using bar charts reveals that the overall subscription rate is only 11%. However, when filtering for durations greater than 2000 seconds i.e 33 mins, the subscription rate is slightly higher or equal. Therefore, these findings are meaningful and should be considered in the machine learning model.](https://github.com/Jatindra23/bank_deposit_prediction/blob/main/output1.png)
 
 
 4. Model Training: Train models using algorithms like XGBoost and CatBoost with hyperparameter tuning.
