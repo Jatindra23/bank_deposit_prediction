@@ -50,7 +50,18 @@ Imbalanced Data: Use SMOTE or similar techniques to balance the dataset.
 Tools: pandas, numpy, imblearn.
 
 3. Exploratory Data Analysis: Understand patterns and correlations in data.
+    - From the above box plot, we observe outliers in the data. Further analysis using bar charts reveals that the overall subscription rate is only 11%. However, when filtering for durations greater than 2000 seconds i.e 33 mins, the subscription rate is slightly higher or equal. Therefore, these findings are meaningful and should be considered in the machine learning model.
    ![ From the above box plot, we observe outliers in the data. Further analysis using bar charts reveals that the overall subscription rate is only 11%. However, when filtering for durations greater than 2000 seconds i.e 33 mins, the subscription rate is slightly higher or equal. Therefore, these findings are meaningful and should be considered in the machine learning model.](https://github.com/Jatindra23/bank_deposit_prediction/blob/main/output1.png)
+
+   ![description](https://github.com/Jatindra23/bank_deposit_prediction/blob/main/output2.png)
+   From the data, we observe a clear positive relationship where mostly individuals aged over 40 tend to have an annual average balance exceeding 50,000.
+  
+   ![description](https://github.com/Jatindra23/bank_deposit_prediction/blob/main/output3.png)
+    - Married individuals account for a higher total number of term deposit subscriptions but the percentage of married people subscribing is lower compared to singles.
+    - Singles, followed by divorced individuals, are more likely to invest in term deposits relative to their group size.
+
+    ![description](https://github.com/Jatindra23/bank_deposit_prediction/blob/main/output4.png)
+    - From the chart, it is evident that individuals with higher average balances are more likely to subscribe to term deposits, a trend particularly noticeable among retirees. Although there are variations across job categories, such as unemployed individuals, this suggests that other factors may also affect subscription rates. Overall, a higher balance seems to have a positive influence on term deposit subscriptions.
 
 
 4. Model Training: Train models using algorithms like XGBoost and CatBoost with hyperparameter tuning.
